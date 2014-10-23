@@ -3,7 +3,10 @@ test_that("mummer mapping is correct",{
   require(rentrez)
   require(testthat)
   source('./mummer align functions.R')
+<<<<<<< HEAD
   
+=======
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   #1. download the first 5000 bps of the N315 sequence from Rentrez-----
   test_raw=entrez_fetch(db="nuccore", id="NC_002745.2", rettype="fasta", from=0, to=5000)
   write(test_raw, "test_raw.fasta")
@@ -62,11 +65,16 @@ test_that("mummer mapping is correct",{
   mum_snps_test1_subs_expect[501:5000,"ref_pos"]=1:4500
   mum_snps_test1_subs_expect[501:5000,"snp"]="mum"
   mum_snps_test1_subs_expect[seq(530,5000,45),"snp"]="sub"
+<<<<<<< HEAD
+=======
+  
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   #7.2.1 dels expected------
   mum_snps_test1_del_subs_expect= mum_snps_test1_subs_expect
   mum_snps_test1_del_subs_expect[c(1499:1501, 2499:2501,3499:3501,4499:4501),"ref_pos"]=NA
   mum_snps_test1_del_subs_expect[!is.na(mum_snps_test1_del_subs_expect[,"ref_pos"]),"ref_pos"]=c(rep(1:4488))
   mum_snps_test1_del_subs_expect[c(1499:1501, 2499:2501,3499:3501,4499:4501),"snp"]="del"
+<<<<<<< HEAD
   #7.2.2 ins expected--------
   mum_snps_test1_ins_subs_expect= mum_snps_test1_subs_expect[1:4488,]
   mum_snps_test1_ins_subs_expect[,"str_pos"]=c(1:4488)
@@ -76,11 +84,22 @@ test_that("mummer mapping is correct",{
   mum_snps_test1_ins_subs_expect[c(998,1995,2992,3989),"snp"]="ins_s"
   mum_snps_test1_ins_subs_expect[c(999, 1996,2993,3990),"snp"]="ins_e"
  
+=======
+  #7.2.2 ins expected (dels flipped)--------
+  mum_snps_test1_ins_subs_expect= mum_snps_test1_subs_expect[1:4488]
+  mum_snps_test1_ins_subs_expect[,"ref_pos"]=c()
+  mum_snps_test1_ins_subs_expect[!is.na(mum_snps_test1_del_subs_expect[,"ref_pos"]),"ref_pos"]=c(rep(1:4488))
+  mum_snps_test1_ins_subs_expect[c(1499:1501, 2499:2501,3499:3501,4499:4501),"snp"]="del"
+  
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   #8. the actual tests--------
   system("cd /data1/home/nbrayko/completed_genomes/")
   cmd_path="/data1/home/rpetit/bin/MUMmer/"
   out_path="" 
+<<<<<<< HEAD
   
+=======
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   #8.1 identical sequences: mummer should throw its own default error------
   delta_filename=run.nucmer("test1", "test1" ,cmd_path,out_path)
   expect_that(run.summary(delta_filename,cmd_path), throws_error())
@@ -93,24 +112,37 @@ test_that("mummer mapping is correct",{
   delta_filename=run.nucmer("test1", "test_subs" ,cmd_path,out_path)
   align_dfs=run.summary(delta_filename,cmd_path)
   mum_snps_test1_subs=build.mummat(align_dfs$snps_df,align_dfs$aligns_df) 
+<<<<<<< HEAD
   ##expect output to match mock expected output
   expect_equal(mum_snps_test1_subs,mum_snps_test1_subs_expect)
   ##expect there to be 4501 unique values in firt column  (1:4500+NA)
+=======
+  #expect output to match mock expected output
+  expect_equal(mum_snps_test1_subs,mum_snps_test1_subs_expect)
+  #expect there to be 4501 unique values in firt column  (1:4500+NA)
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   expect_that(length(unique(mum_snps_test1_subs[,1])),equals(4501))
   
   #8.4 test2 against dels--------
   delta_filename=run.nucmer("test1", "test_del_subs" ,cmd_path,out_path)
   align_dfs=run.summary(delta_filename,cmd_path)
   mum_snps_test1_del_subs=build.mummat(align_dfs$snps_df,align_dfs$aligns_df) 
+<<<<<<< HEAD
   ##expect output to match mock expected output
   expect_equal(mum_snps_test1_del_subs,mum_snps_test1_del_subs_expect)
   ##expect there to be 4501 unique values in firt column  (1:4500+NA)
+=======
+  #expect output to match mock expected output
+  expect_equal(mum_snps_test1_del_subs,mum_snps_test1_del_subs_expect)
+  #expect there to be 4501 unique values in firt column  (1:4500+NA)
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   expect_that(length(unique(mum_snps_test1_del_subs[,1])),equals(4501) )
   
   #8.5 test1 agains insertions---------
   delta_filename=run.nucmer("test_del_subs","test1" ,cmd_path,out_path)
   align_dfs=run.summary(delta_filename,cmd_path)
   mum_snps_test1_ins_subs=build.mummat(align_dfs$snps_df,align_dfs$aligns_df) 
+<<<<<<< HEAD
   ##expect output to match mock expected output
   expect_equal(mum_snps_test1_ins_subs,mum_snps_test1_ins_subs_expect)
   ##expect there to be 4501 unique values in firt column  (1:4500-12 skips)
@@ -120,5 +152,14 @@ test_that("mummer mapping is correct",{
   delta_filename=run.nucmer("test_indel_subs" , "test1" ,cmd_path,out_path)
   align_dfs=run.summary(delta_filename,cmd_path)
   mum_snps_test1_indels=build.mummat(align_dfs$snps_df,align_dfs$aligns_df) 
+=======
+  expect_equal(mum_snps_test1_ins_subs,mum_snps_test1_del_subs_expect)
+  
+  #compare test1 as ref and subs as qry
+  
+  #completely different sequences???
+  
+  
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   
 }

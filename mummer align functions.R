@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 run.nucmer=function(str_name,ref_name="N315", cmd_path,out_path ){
+=======
+function(str_name,ref_name="N315", cmd_path,out_path ){
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   require(ape)
   #### Check that the inputs are all DNA sequences
   if (unique(names(table(as.character(read.FASTA(paste0(out_path, str_name,".fasta")))))!= c("a", "c", "g" ,"t"))) stop("Str not a DNA sequence")
@@ -24,7 +28,11 @@ run.nucmer=function(str_name,ref_name="N315", cmd_path,out_path ){
   return(paste0(ret_filename))
 }
 
+<<<<<<< HEAD
 run.summary=function(ret_filename,cmd_path){
+=======
+function(ret_filename,cmd_path){
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   #### 2) generate summary of the alignments ######
   # -g nly display alignments included in the Longest Ascending Subset, i.e. the global alignment. Recommened to be used in conjunction with the -r or -q options. Does not support circular sequences
   # -l includes seq length
@@ -63,10 +71,17 @@ run.summary=function(ret_filename,cmd_path){
 }
 
 
+<<<<<<< HEAD
 build.mummat=function(snps_df, aligns_df){
   ###########
   #5)create matrix of alignment where columns are the aligned positions of strain vs reference, and snp=0 for mum, 1 for subs, 2 for indel------
   mum_snps=matrix(nrow=max(aligns_df$str_len)+1, ncol=3)
+=======
+function(snps_df, aligns_df){
+  ###########
+  #5)create matrix of alignment where columns are the aligned positions of strain vs reference, and snp=0 for mum, 1 for subs, 2 for indel------
+  mum_snps=matrix(nrow=max(aligns_df$str_len), ncol=3)
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
   colnames(mum_snps)=c("str_pos", "ref_pos", "snp")
   mum_snps[,"snp"]="non-align"
   
@@ -89,6 +104,7 @@ build.mummat=function(snps_df, aligns_df){
     snps_df_temp =  snps_df[which(snps_df$str_pos>=temp_align_s & snps_df$str_pos<= temp_align_e),]
     if (nrow(snps_df_temp) ==0) {
       warning(paste("Ambiguous alignment between qry strain pos",temp_align_s,temp_align_e,", no mapping produced" )) 
+<<<<<<< HEAD
     } else { 
       print(paste("Aligning qry strain pos",temp_align_s,"-", temp_align_e ))  
       #make string variable describing type of SNP
@@ -145,6 +161,63 @@ build.mummat=function(snps_df, aligns_df){
           #mum_snps[temp_s,"snp"]=snps_df_temp[i,"snp"]
           mum_snps[temp_s,"snp"]="del"
         }
+=======
+    } else print(paste("Aligning qry strain pos",temp_align_s,"-", temp_align_e ))
+    
+    #make string variable describing type of SNP
+    snps_df_temp$snp = paste0(snps_df_temp$str_sub,">",snps_df_temp$ref_sub)
+    #fill positions up to first snp of that alignment:
+    mum_snps[temp_align_s:(snps_df_temp[1,]$str_pos),"str_pos"]= temp_align_s:(snps_df_temp[1,]$str_pos)
+    diff= temp_align_s-aligns_df[a,]$ref_pos
+    mum_snps[temp_align_s:(snps_df_temp[1,]$str_pos),"ref_pos"]= temp_align_s:(snps_df_temp[1,]$str_pos)-diff
+    mum_snps[!is.na(mum_snps)&mum_snps<=0]=NA
+    
+    #for each SNP in the alignment:
+    for (i in 1:nrow(snps_df_temp) ) {   
+      #if the SNP is a substitution:
+      if (snps_df_temp[i,]$ref_sub!="." & snps_df_temp[i,]$str_sub!="."  ) {  
+        #fill in positions for the qry strain for basepairs between current and previous sub/indel
+        temp_diff=snps_df_temp[i,]$str_pos - snps_df_temp[i,]$ref_pos
+        #get start position of mum gap for str
+        temp_s=snps_df_temp[i,]$str_pos
+        #get the end. if the end of alignment is reached, the temp_end of the mum is temp_align_e
+        if (i==nrow(snps_df_temp)) temp_e = temp_align_e else temp_e=snps_df_temp[i+1,]$str_pos 
+        mum_snps[temp_s:temp_e,"str_pos"]=temp_s:temp_e
+        #the ref position is the query - the shift between the frames
+        mum_snps[temp_s:temp_e,"ref_pos"]=(temp_s:temp_e)-temp_diff 
+        #mark as snp
+        #mum_snps[temp_s,"snp"]=snps_df_temp[i,"snp"]
+        mum_snps[temp_s,"snp"]="sub"
+      }
+      
+      #if SNP is a deletion in qry string (insertion)
+      if (snps_df_temp[i,]$ref_sub!="." & snps_df_temp[i,]$str_sub=="."  ) {
+        #fill in positions for the qry strain for basepairs between current and previous sub/indel
+        temp_diff=snps_df_temp[i,]$str_pos - snps_df_temp[i,]$ref_pos
+        temp_s=snps_df_temp[i,]$str_pos+1
+        #if the end of alignment is reached, the temp_end of the mum is temp_align_e
+        if (i==nrow(snps_df_temp)) temp_e = temp_align_e+1 else temp_e=snps_df_temp[i+1,]$str_pos+1
+        mum_snps[temp_s:temp_e,"str_pos"]=temp_s:temp_e
+        #the ref position is the query - the shift between the frames
+        mum_snps[temp_s:temp_e,"ref_pos"]=(temp_s:temp_e)-temp_diff     
+        mum_snps[(temp_s-1),"snp"]="ins_s"
+        mum_snps[(temp_s),"snp"]="ins_e"
+      }  
+      
+      if (snps_df_temp[i,]$ref_sub=="." & snps_df_temp[i,]$str_sub!=".") {
+        #fill in positions for the qry strain for basepairs between current and previous sub/indel
+        temp_diff=snps_df_temp[i,]$str_pos - snps_df_temp[i,]$ref_pos
+        #get start position of mum gap for str
+        temp_s=snps_df_temp[i,]$str_pos
+        #get the end. if the end of alignment is reached, the temp_end of the mum is temp_align_e
+        if (i==nrow(snps_df_temp)) temp_e = temp_align_e else temp_e=snps_df_temp[i+1,]$str_pos  
+        mum_snps[temp_s:temp_e,"str_pos"]=temp_s:temp_e
+        #the ref position is the query - the shift between the frames
+        mum_snps[(temp_s):temp_e,"ref_pos"]=c( NA,(temp_s+1):(temp_e)-temp_diff )
+        #change the snp variable to mark as deletion in reference string
+        #mum_snps[temp_s,"snp"]=snps_df_temp[i,"snp"]
+        mum_snps[temp_s,"snp"]="del"
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
       }
     }
   }

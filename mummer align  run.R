@@ -1,15 +1,23 @@
+<<<<<<< HEAD
 rm(list=ls())
 getwd()
+=======
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
 
 source('./mummer align functions.R')
 #USE MUMMER for pairwise alignmnet of 2 strains, check out table output and map from sry strain to reference----
 
+<<<<<<< HEAD
 str_name="MW2"
+=======
+str_name="Mu50"
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
 ref_name="N315"
 system("cd /data1/home/nbrayko/completed_genomes")
 cmd_path="/data1/home/rpetit/bin/MUMmer/"
 out_path="/data1/home/nbrayko/completed_genomes/" 
 
+<<<<<<< HEAD
 #run mummer
 delta_filename=run.nucmer(str_name,ref_name,cmd_path,out_path)
 align_dfs=run.summary(delta_filename,cmd_path) 
@@ -48,3 +56,8 @@ plotAnc(tree_like, anc_ml, 4,
         show.tip.label = FALSE, 
         type="fan")
 
+=======
+delta_filename=run.nucmer(str_name,ref_name,cmd_path,out_path)
+align_dfs=run.summary(delta_filename,cmd_path)
+mum_snps=build.mummat(align_dfs$snps_df,align_dfs$aligns_df)
+>>>>>>> dd81f1bdf4e2b72bf0f1acd60b551cafeafc2eb6
